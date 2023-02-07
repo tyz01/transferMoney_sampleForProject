@@ -1,39 +1,36 @@
 package com.example.transferMoney.controller;
 
-import com.example.transferMoney.model.TransferBalance;
-import com.example.transferMoney.service.BankService;
+import com.example.transferMoney.model.Balance;
+import com.example.transferMoney.service.BalanceService;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
-@Slf4j
-@RestController("/balance")
 @AllArgsConstructor
+@RequestMapping("/balance")
+@RestController
 public class BalanceController {
 
-    private BankService bankService;
+    private BalanceService balanceService;
+
+    @PostMapping("/")
+    public Balance createBalance(@RequestBody Balance balance) {
+        return balanceService.createBalance(balance);
+    }
 
     @GetMapping("/{accountId}")
-    public BigDecimal getBalance(@PathVariable Long accountId) {
-        return bankService.getBalance(accountId);
+    public BigDecimal checkBalance(@PathVariable Long accountId) {
+        return balanceService.checkBalance(accountId);
     }
 
-    @PostMapping("/add")
-    public BigDecimal addMoney(@RequestBody TransferBalance transferBalance) {
-        return bankService.addMoney(transferBalance.getTo(), transferBalance.getAmount());
+    @GetMapping("/addMoney/{accountId}")
+    public BigDecimal findBalanceById(@PathVariable Long accountId) {
+        return balanceService.findBalanceById(accountId);
     }
 
-    @PostMapping("/transfer") //balance account that take money
-    public void transfer(@RequestBody TransferBalance transferBalance) {
-        bankService.makeTransfer(transferBalance);
+    @PostMapping("/addMoney/{accountId}")
+    public BigDecimal addMoneyOnBalance(@PathVariable Long accountId, @RequestBody Balance balance) {
+        return balanceService.addMoneyOnBalance(accountId, balance.getMoneyAdd());
     }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public String handle(IllegalArgumentException e) {
-        log.error(e.getMessage());
-        return "all broke";
-    }
-
 }
